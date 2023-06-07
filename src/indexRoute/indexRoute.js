@@ -14,6 +14,7 @@ router.post("/login", indexController.iniciarSesion);
 router.get("/", (req, res) => {
   res.send('Welcome to my Server')
 })
+
 router.get("/usuario/:id", indexController.getUser);
 
 module.exports = router;

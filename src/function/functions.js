@@ -50,7 +50,11 @@ const registrarUsuario = async (usuario) => {
   let {
     nombre,
     apellido_paterno,
+    rut,
     email,
+    telefono,
+    direccion,
+    comuna,
     tipo_user,
     password,
   } = usuario;
@@ -59,12 +63,16 @@ const registrarUsuario = async (usuario) => {
   const values = [
     nombre,
     apellido_paterno,
+    rut,
     email,
+    telefono,
+    direccion,
+    comuna,
     tipo_user,
-    password,
+    passwordEncriptada,
   ];
   const consulta =
-    "INSERT INTO usuarios values (DEFAULT, $1, $2, $3, $4, $5)";
+    "INSERT INTO usuarios values (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9)";
   await pool.query(consulta, values);
 };
 
@@ -76,14 +84,13 @@ const ObtenerUsuario = async (id) => {
     const { rows } = await pool.query(consulta, values);
     console.log("lectura base datos usuario");
     console.log(rows);
-    return rows[0];
+    return rows;
   } catch (err) {
     console.log("error database usuario");
     console.log(pool);
     throw err;
   }
 };
-
 
 module.exports = {
   verificarUsuario,

@@ -10,6 +10,7 @@ app.use(express.json());
 app.use(express.static("public"));
 app.use('/', router);
 
+// High level error handling
 app.use((req, res, next) => {
   const error = new Error('Not found');
   error.statusCode = 404;
