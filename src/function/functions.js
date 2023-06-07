@@ -76,6 +76,77 @@ const registrarUsuario = async (usuario) => {
   await pool.query(consulta, values);
 };
 
+const actualizarUsuario = async (usuario, id) => {
+  let {
+    nombre,
+    apellido_paterno,
+    rut,
+    email,
+    telefono,
+    direccion,
+    comuna,
+    password,
+  } = usuario;
+  const passwordEncriptada = bcrypt.hashSync(password);
+  password = passwordEncriptada;
+  const values = [
+    nombre,
+    apellido_paterno,
+    rut,
+    email,
+    telefono,
+    direccion,
+    comuna,
+    password,
+    id,
+  ];
+  const consulta =
+    "UPDATE usuarios SET nombre = $1, apellido_paterno = $2, rut = $3, email = $4, telefono = $5, direccion = $6, comuna = $7, password = $8 WHERE id = $9";
+  await pool.query(consulta, values);
+};
+
+const registrarRecinto = async (recinto) => {
+  let { usuarios_id, nombre, telefono, email, direccion, comuna, estado } =
+    recinto;
+  const values = [
+    usuarios_id,
+    nombre,
+    telefono,
+    email,
+    direccion,
+    comuna,
+    estado,
+  ];
+  const consulta =
+    "INSERT INTO recinto values (DEFAULT, $1, $2, $3, $4, $5, $6, $7)";
+  await pool.query(consulta, values);
+};
+
+const actualizarRecinto = async (recinto, id) => {
+  let { usuarios_id, nombre, telefono, email, direccion, comuna, estado } =
+    recinto;
+  const values = [
+    usuarios_id,
+    nombre,
+    telefono,
+    email,
+    direccion,
+    comuna,
+    estado,
+    id,
+  ];
+  const consulta =
+    "UPDATE recinto SET usuarios_id = $1, nombre = $2, telefono = $3, email = $4, direccion = $5, comuna = $6, estado = $7 WHERE id = $8";
+  await pool.query(consulta, values);
+};
+
+const obtenerRecintosTenant = async (usuarios_id) => {
+  const consulta = "SELECT * FROM recinto WHERE usuarios_id = $1";
+  const values = [usuarios_id];
+  const { rowCount } = await pool.query(consulta, values);
+  if (!rowCount) throw { code: 404, message: "No se encontraron recintos" };
+};
+
 const ObtenerUsuario = async (id) => {
   try {
     console.log(id);
@@ -92,8 +163,64 @@ const ObtenerUsuario = async (id) => {
   }
 };
 
+const obtenerRecintoUser = async (comuna) => {
+  const consulta = "SELECT * FROM recinto";
+  const values = [comuna];
+  const { rowCount } = await pool.query(consulta, values);
+  if (!rowCount) throw { code: 404, message: "No se encontraron recintos" };
+};
+
+const obtenerCanchas = async () => {
+  const consulta = "SELECT * FROM canchas";
+  const { rows } = await pool.query(consulta);
+  if (!rows.length) {
+    throw { code: 404, message: "No se encontraron canchas" };
+  }
+  return rows;
+};
+
+const registrarCancha = async (cancha) => {
+  let { recinto_id, usuarios_id, deporte, jugadores, fecha, estado, img, nombre, precio, ubicacion } = cancha;
+  const values = [recinto_id, usuarios_id, deporte, jugadores, fecha, estado, img , nombre, precio, ubicacion];
+  const consulta =
+    "INSERT INTO canchas values (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)";
+  await pool.query(consulta, values);
+};
+
+const actualizarCancha = async (cancha, id) => {
+  let { usuarios_id, recinto_id, deporte, jugadores, fecha, estado } = cancha;
+  const values = [
+    usuarios_id,
+    recinto_id,
+    deporte,
+    jugadores,
+    fecha,
+    estado,
+    id,
+  ];
+  const consulta =
+    "UPDATE cancha SET usuarios_id = $1, recinto_id = $2, deporte = $3, jugadores = $4, fecha = $5, estado = $6 WHERE id = $7";
+  await pool.query(consulta, values);
+};
+
+const registrarReserva = async (cancha) => {
+  let { cancha_id, recinto_id, fecha_inicio, fecha_termino, estado } = reserva;
+  const values = [cancha_id, recinto_id, fecha_inicio, fecha_termino, estado];
+  const consulta = "INSERT INTO reserva values (DEFAULT, $1, $2, $3, $4, $5)";
+  await pool.query(consulta, values);
+};
+
 module.exports = {
   verificarUsuario,
   registrarUsuario,
+  actualizarUsuario,
+  registrarRecinto,
+  actualizarRecinto,
+  obtenerRecintosTenant,
+  obtenerRecintoUser,
+  obtenerCanchas,
+  registrarCancha,
+  actualizarCancha,
+  registrarReserva,
   ObtenerUsuario,
 };
